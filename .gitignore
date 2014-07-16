@@ -4,3 +4,9 @@
 *prueba*
 *LINUX*
 #*
+*.c~
+*.itf
+*_glue*
+*.o
+*.pl~
+*.po
