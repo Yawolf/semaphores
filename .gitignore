@@ -1,0 +1,6 @@
+*.lock
+*.lck
+*.so
+*prueba*
+*LINUX*
+#*
