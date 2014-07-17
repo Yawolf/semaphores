@@ -18,7 +18,9 @@ void create_lock (char * file_name) {
   FILE * fd;
   snprintf(lock_name,100,".%s.lck",file_name); /* save in lock_name the name of the lock */
 
-  fd = fopen (lock_name,"ab+"); /* open the lock with the flags ab+, it means, Create or append */
+  if (exists_lock(lock_name) == 0) return; /* if the lock already exists, use the old one */
+
+  fd = fopen (lock_name,"w+"); /* open the lock with the flags ab+, it means, Create or append */
   if (fd == NULL) { fprintf(stderr,"cannot create lock\n"); return; } /* if fopen fails, cannot create the lock */
   else fputc(UNLOCK,fd); /* otherway set free the lock writing 0 inside */
 
@@ -40,18 +42,18 @@ void file_lock (char * file) {
     fprintf (stderr,"this lock does not exists\n"); /* a return value < 0 means that the file doesn't exist */ 
     return;
   } 
-  
+ prove:  
   fd = fopen (lock_name, "r+"); /* Open the lock in READ/WRITE mode */
   
   if (fd == NULL) {
     perror("open");
     return;
   }
-prove:
+
   lock_value = fgetc(fd); /* take the first character */
   if (lock_value == UNLOCK) { fd = freopen(NULL,"w+",fd); fputc(LOCK,fd); }
   /* if the car == 0 then the process can take the lock setting it at 1 */
-  else { nanosleep (&timer, &timer); goto prove; }
+  else { nanosleep (&timer, &timer); fclose(fd); goto prove; }
   /* if the lock is not free the process waits and trys again after 0.1 seconds */
 
   fclose(fd); /* close the file */

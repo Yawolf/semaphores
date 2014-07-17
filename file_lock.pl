@@ -6,6 +6,6 @@
 :- true pred clear_lock(in(FILE)) :: atm + (foreign).
 
 lopen(File,Mode,Stream) :- create_lock(File), file_lock(File), open(File,Mode,Stream).
-lclose(File,Stream) :- close(Stream), clear_lock(File).
+lclose(File,Stream) :- file_unlock(File), close(Stream), clear_lock(File).
 
 :- use_foreign_source(file_lock).
