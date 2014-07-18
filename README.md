@@ -4,7 +4,7 @@
 
 Author: Santiago Cervantes, IMDEA Software Institute.
 
-CONTENTS
+* CONTENTS
         1. INTRODUCTION
         2. FILES
         3. USAGE
