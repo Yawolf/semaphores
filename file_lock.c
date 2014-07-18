@@ -10,15 +10,16 @@
 #define LOCK '1'
 #define UNLOCK '0'
 
-char lock_name [100];
+#define TMAX 255
+
+char lock_name [TMAX];
 
 /** This function creates the lock named .$file_to_lock.lck  */
 
 void create_lock (char * file_name) {
   FILE * fd;
   snprintf(lock_name,100,".%s.lck",file_name); /* save in lock_name the name of the lock */
-
-  if (exists_lock(lock_name) == 0) return; /* if the lock already exists, use the old one */
+  if (exists_lock(file_name) <= 0) return; /* if the lock already exists, use the old one */
 
   fd = fopen (lock_name,"w+"); /* open the lock with the flags ab+, it means, Create or append */
   if (fd == NULL) { fprintf(stderr,"cannot create lock\n"); return; } /* if fopen fails, cannot create the lock */
@@ -107,26 +108,34 @@ void clear_lock (char * file) {
   (lock_value == UNLOCK) ? remove (lock_name) : fprintf(stderr,"cannot remove lock, still in use");
 }
 
+/* this function comproves if the lock already exists and if the file to lock exists too */
 int exists_lock (char * file_name) {
   DIR * curr_dir;
-  char path_cdir [100]; /* a name with size 100 chars */
-  struct dirent *dir;  
+  char path_cdir [TMAX]; /* a name with size 100 chars */
+  struct dirent *dir;
+  int flag = 0; /* may I needn't the flag */
 
-  if (getcwd(path_cdir,100) == NULL) {
+  if (getcwd(path_cdir,100) == NULL) { /* get the current directory */
     perror("getcwd");
     return -1;
   }
   
-  if ((curr_dir = opendir(path_cdir)) == NULL) {
+  if ((curr_dir = opendir(path_cdir)) == NULL) { /* open current directory */
     perror("opendir");
     return -1;
   }
+
+  while ((dir = readdir (curr_dir)) != NULL) /* test if the file exists */
+      if (!strcmp(dir->d_name,file_name)) { flag = 0; break; }
+      else { flag = 1; continue; }
+
+  if (flag == 1) return -3; /*-3 is returned when the file does not exist*/
   
-  while ((dir = readdir(curr_dir)) != NULL) {
-    if (dir->d_name[0] != '.') continue;
-    else 
-      if (!strcmp(dir->d_name,lock_name)) return 0;
-      else continue;
+  while ((dir = readdir(curr_dir)) != NULL) { /* test if the lock exists */
+      if (dir->d_name[0] != '.') continue; /* locks begins by '.' */
+      else 
+          if (!strcmp(dir->d_name,lock_name)) return 0; /* 0 means that the lock exists */
+          else continue;
   }
-  return -2;
+  return 1;
 }
