@@ -5,10 +5,10 @@
 Author: Santiago Cervantes, IMDEA Software Institute.
 
 * CONTENTS:
-        I - INTRODUCTION
-        II - FILES
-        III - USAGE
-        IV - BUGS AND KNOWN ISSUES
+        I. INTRODUCTION
+        II. FILES
+        III. USAGE
+        IV. BUGS AND KNOWN ISSUES
 
 I. INTRODUCTION
 
@@ -42,7 +42,7 @@ III. USAGE
      created and, if it is in use, unlock it overwritting the inside value to UNLOCK (0).
                        FILE is an atom.
 
-     clear_lock(FILE) -> This predicate delete the file assigned to a file if and only if the lock is free.
+     clear_lock(FILE) -> This predicate delete the lock assigned to a file if and only if it is free.
                        FILE is an atom.
 
      lopen(FILE,MODE,STREAM) -> lock open, is only a open called with locks. Is equals to:
