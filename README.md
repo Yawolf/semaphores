@@ -5,12 +5,12 @@
 Author: Santiago Cervantes, IMDEA Software Institute.
 
 * CONTENTS:
-        I. INTRODUCTION
-        II. FILES
-        III. USAGE
-        IV. BUGS AND KNOWN ISSUES
+        1. INTRODUCTION
+        2. FILES
+        3. USAGE
+        4 BUGS AND KNOWN ISSUES
 
-I. INTRODUCTION
+1. INTRODUCTION
 
    This project is an easy implementation of one file lock for Ciao (Prolog). 
    The predicates are implemented in C language using the Ciao module "foreign_interface".
@@ -19,14 +19,14 @@ I. INTRODUCTION
 
 
 
-II. FILES
+2. FILES
     
     file_lock.c -> file lock's implementation in C language programming.
     file_lock.pl -> file lock's predicates declaration for Ciao (Prolog).
 
 
 
-III. USAGE
+3. USAGE
 
      create_lock(FILE) -> This predicate creates a lock assigned to the file that you're passing as atom. 
      Actually, the lock is only a new file created in the current directory  with name .var{file}.lck. 
@@ -64,7 +64,7 @@ III. USAGE
 
 
 
-IV. BUGS AND KNOWN ISSUES
+4. BUGS AND KNOWN ISSUES
 
     The locks can only be created in the current folder, in other words, if you current directory 
     is /home/$USER, create_lock(/home/$USER/my_folder/my_file.txt) will not work properly.
