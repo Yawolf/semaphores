@@ -5,10 +5,10 @@
 Author: Santiago Cervantes, IMDEA Software Institute.
 
 * CONTENTS
-* 1. INTRODUCTION
-* 2. FILES
-* 3. USAGE
-* 4 BUGS AND KNOWN ISSUES
+  * 1. INTRODUCTION
+  * 2. FILES
+  * 3. USAGE
+  * 4 BUGS AND KNOWN ISSUES
 
 1 - INTRODUCTION
 
