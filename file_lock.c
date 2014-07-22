@@ -28,7 +28,7 @@ void create_lock (char * file_name) {
   fclose (fd); /* close lock */
 }
 
-/*At first, this function comproves if exists a file lock, if it exists try to take it.
+/*At first, this function tests if exists a file lock, if it exists try to take it.
 If the lock is free can take it, in another way the process waits till the lock is released*/
 
 void file_lock (char * file) {
@@ -37,7 +37,7 @@ void file_lock (char * file) {
   struct timespec timer; /* struct necessary for nanosleep */
   timer.tv_sec = 0;
   timer.tv_nsec = 100000000; /* 100000000 nsec = 0.1 sec */
-  int ret = exists_lock(file); /* comproves if the lock exists */
+  int ret = exists_lock(file); /* tests if the lock exists */
 
   if (ret < 0) {
     fprintf (stderr,"this lock does not exists\n"); /* a return value < 0 means that the file doesn't exist */ 
@@ -65,7 +65,7 @@ void file_lock (char * file) {
 void file_unlock (char * file) {
   FILE * fd;
   int lock_value;
-  int ret = exists_lock(file); /* comproves if the lock exists */
+  int ret = exists_lock(file); /* tests if the lock exists */
 
   if (ret < 0) {
     fprintf (stderr,"this lock does not exists.\n"); /* a return value < 0 means that the file doesn't exist */ 
@@ -104,11 +104,11 @@ void clear_lock (char * file) {
   }
   
   lock_value = fgetc(fd); 
-  /* comprove if the lock has been released  and delete it*/
+  /* test if the lock has been released  and delete it*/
   (lock_value == UNLOCK) ? remove (lock_name) : fprintf(stderr,"cannot remove lock, still in use");
 }
 
-/* this function comproves if the lock already exists and if the file to lock exists too */
+/* this function tests if the lock already exists and if the file to lock exists too */
 int exists_lock (char * file_name) {
   DIR * curr_dir;
   char path_cdir [TMAX]; /* a name with size 100 chars */

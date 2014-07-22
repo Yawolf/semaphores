@@ -1,14 +1,12 @@
-:- module(test2, [main/0, read_file/2]).
+:- module(test2, [main/0]).
 :- use_module(file_lock).
 :- use_module(library(strings)).
-
-read_file(_,end_of_line).
-read_file(Stream,String) :-
-        get_lines(Stream,String),
-        write_string(String),
-        read_file(Stream,String).
+:- use_module(library(file_utils)).
 
 main :-
-        lopen('asdf.txt',read,Stream),
-        read_file(Stream,String),
-        lclose('asdf.txt',Stream).
+        create_lock('asdf.txt'),
+        file_lock('asdf.txt'),
+        file_to_string('asdf.txt',String),
+        write_string(String),
+        file_unlock('asdf.txt'),
+        clear_lock('asdf.txt').
