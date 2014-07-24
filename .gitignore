@@ -19,3 +19,6 @@ test4
 test5
 test6
 *.py~
+*.old
+testError
+testNoLock
