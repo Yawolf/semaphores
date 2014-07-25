@@ -2,21 +2,21 @@
 :- use_module(library(system)).
 :- use_module(library(process)).
 :- use_module(library(strings)).
-:- use_module(file_lock).
+:- use_module('../file_lock').
 %% This test runs two Ciao proces, test1 writes a string into a file and test2 reads the string in the file.
 test :-
-        cd('/home/santiago.cervantes/file_lock'),
+        cd('/home/santiago.cervantes/file_lock/src/tests'),
         system('./test1'),
         system('./test2').
 
 %% Test: calling a python program
 test2 :-
-        cd('/home/santiago.cervantes/file_lock'),
+        cd('/home/santiago.cervantes/file_lock/src/tests'),
         system('python threads.py').
 
 %Test: two concurrent writters and one reader
 test3 :-
-        cd('/home/santiago.cervantes/file_lock'),
+        cd('/home/santiago.cervantes/file_lock/src/tests'),
         process_call(test1,[],[background(P1)]),
         process_call(test3,[],[background(P3)]),
         process_join(P1),process_join(P3),
@@ -25,7 +25,7 @@ test3 :-
 
 %%Test: Five concurrent writters and one reader
 test4 :-
-        cd('/home/santiago.cervantes/file_lock'),
+        cd('/home/santiago.cervantes/file_locksrc/tests'),
         process_call(test1,[],[background(P1)]),
         process_call(test3,[],[background(P3)]),
         process_call(test4,[],[background(P4)]),
@@ -41,14 +41,14 @@ test4 :-
 
 %%Test: starts Number concurrent writters and one reader
 test5(Number) :-
-        cd('/home/santiago.cervantes/file_lock'),
+        cd('/home/santiago.cervantes/file_lock/src/tests'),
         writeLoop(test1,Number,[]),
         process_call(test2,[],[background(P1)]),
         process_join(P1).
 
 %%Test: starts Number concurrent writters without file_lock control and only one reader.
 testNoLock(Number) :-
-        cd('/home/santiago.cervantes/file_lock'),
+        cd('/home/santiago.cervantes/file_locksrc/tests'),
         writeLoop(testNoLock,Number,[]),
         process_call(testError,[],[background(P1)]),
         process_join(P1).

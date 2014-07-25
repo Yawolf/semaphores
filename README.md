@@ -15,7 +15,7 @@ Author: Santiago Cervantes, IMDEA Software Institute.
    This project is an easy implementation of one file lock for Ciao (Prolog). 
    The predicates are implemented in C language using the Ciao module "foreign_interface".
    New open and close predicates are implemented named lopen and lclose, they are, basically,
-   a predicates with a lock created and ready to use.
+   a predicate with a lock created and ready to use.
 
 
 
