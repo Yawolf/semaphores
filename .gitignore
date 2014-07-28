@@ -26,3 +26,4 @@ subs
 sum
 subsNoLock
 sumNoLock
+*.txt~
