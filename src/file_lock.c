@@ -25,11 +25,10 @@ void file_lock (char * file, char * mode) {
     
     while (fcntl(fd, F_SETLK, &fl) == -1) {
         if (errno == EACCES || errno == EAGAIN) {
-            /* printf("sleeping!\n"); */
-            printf("Fucking sleeping!\n");
+            printf("sleeping!\n");
             nanosleep(&timer,&timer);
         } else {
-            printf("NON SEI QUE CARALLO ESTOY FACENDO ENQUI!\n");
+            printf("ERROR FCNTL\n");
         }
     }
 }
