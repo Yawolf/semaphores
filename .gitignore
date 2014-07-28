@@ -22,3 +22,7 @@ test6
 *.old
 testError
 testNoLock
+subs
+sum
+subsNoLock
+sumNoLock

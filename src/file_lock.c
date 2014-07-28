@@ -4,32 +4,33 @@
 #include <stdlib.h>
 #include <time.h>
 #include <errno.h>
+#include <string.h>
 
 struct flock fl;
 int fd;
 
-void file_lock (char * file) {
+void file_lock (char * file, char * mode) {
     struct timespec timer = {0, 100000000};
-
-    fl.l_type = F_RDLCK;
+    
+    fl.l_type = F_WRLCK;
     fl.l_whence = SEEK_SET;
     fl.l_start = 0;
     fl.l_len = 0;
+    fl.l_pid = getpid();
     
- retry:
     if ((fd = open(file,O_RDWR)) == -1) {
         perror("open");
         return;
-    } 
-    if (fcntl(fd, F_SETLK, &fl) == -1) {
+    }
+    
+    while (fcntl(fd, F_SETLK, &fl) == -1) {
         if (errno == EACCES || errno == EAGAIN) {
+            /* printf("sleeping!\n"); */
+            printf("Fucking sleeping!\n");
             nanosleep(&timer,&timer);
-            close(fd);
-            goto retry;
         } else {
-            perror("fcntl create");
-            return;
-        } 
+            printf("NON SEI QUE CARALLO ESTOY FACENDO ENQUI!\n");
+        }
     }
 }
 
@@ -38,7 +39,8 @@ void file_unlock (char * file) {
     fl.l_whence = SEEK_SET;
     fl.l_start = 0;
     fl.l_len = 0;
-    
+    fl.l_pid = getpid();
+
     if (fcntl(fd, F_SETLK, &fl) == -1) {
         perror("fcntl unlock");
         return;

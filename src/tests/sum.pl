@@ -7,7 +7,7 @@
 :- use_module(tests, [insert/3]).
 
 :- export(init/2).
-init([X],List).
+init([X],_).
 init([H|T],List) :- init(T,List2),insert(H,List2,List3),reverse(List3,List).
 
 :- export(file_to_number/2).
@@ -22,18 +22,15 @@ sumNumber(Number,Number2) :-
 
 :- export(writeNumber/2).
 writeNumber(Stream,Number) :-
-        insert(Number,[],Number2),
-        write_string(Stream,Number2).
+        number_codes(Number,Code),
+        write_string(Stream,Code),
+        write_string(Stream,"\n").
 
-:-export(loopWrite/1).
-loopWrite(0).
-loopWrite(Times) :-
-        file_lock('number'),
+:- export(main/0).
+main :- file_lock('number'),
         file_to_number('number',Number),
         sumNumber(Number,Result),
         open('number',write,Stream),
         writeNumber(Stream,Result),
         close(Stream),
-        file_unlock('number'),
-        Times2 is Times-1,
-        loopWrite(Times2).
+        file_unlock('number').

@@ -1,6 +1,6 @@
 :- module(test6, [main/0]).
 
-:- use_module(file_lock).
+:- use_module('../file_lock').
 :- use_module(library(strings)).
 
 main :-

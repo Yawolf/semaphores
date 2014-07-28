@@ -7,25 +7,23 @@
 :- doc(module, "This is basic file lock implementation as support of open and close predicate.
 ").
 
-%% IDEA: Create a basic file lock that avoid the read or write in a file
+%% IDEA: Create a basic file lock that avoid the access to a file
 %% while the lock exists.
 
 % TODO: `open(File,Mode,Stream)` has a lock inside, need to test if this
 %% lock actually works well.
 :- export(file_lock/1).
 :- pred file_lock(File) # "Create a lock assigned to the file @var{File}.".
-%% `file_lock(+FILE)' tests if the lock assigned to a file FILE exists,
-%% if the lock exists then the process waits till the lock is free (deleted).
-:- true pred file_lock(in(FILE)) :: atm  + (foreign).
+%% `file_lock(+FILE)' Use fcntl POSIX to lock a file, if the file is locked
+%% the process waits.
+:- true pred file_lock(in(FILE)) :: atm + (foreign).
 %% FILE is an atom, is the name of the file to lock.
 
 :- export(file_unlock/1).
 :- pred file_unlock(File) # "unlock the file @var{File} locked by file_lock(File).".
-%% `file_unlock(+FILE)' tests if the lock assigned to a file FILE exists,
-%% if the lock exists the process delete it.
+%% `file_unlock(+FILE)' unlock the file using fcntl POSIX.
 :- true pred file_unlock(in(FILE)) :: atm + (foreign).
 %% FILE is an atom, is the name of the file to unlock.
-
 
 % TODO: this predicate can be improved. Implemented only for tests
 %% lopen: is an open predicate with a lock ready to use. 
