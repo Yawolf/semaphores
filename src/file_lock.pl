@@ -44,3 +44,4 @@ lclose(File,Stream) :- file_unlock(File), close(Stream).
 %% Stream is the Stream of a file given by the lopen predicate.
 
 :- use_foreign_source(file_lock).
+:- extra_compiler_opts(['-lpthread', '-Wall']).

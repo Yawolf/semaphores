@@ -96,7 +96,8 @@ testNoLockNumber(Number,List) :-
         testNoLockNumber(Number2,List),
         insert(P1,List,List2), insert(P2,List2,List3),
         foreachJoin(List3).
-        
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 %% AUXILIAR PREDICATES %%
