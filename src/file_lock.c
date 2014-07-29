@@ -36,7 +36,7 @@ void file_lock (char * file) {
         if (errno == EACCES || errno == EAGAIN) {
             printf("ERROR,SHOULDN'T PRINT THIS!\n");
         } else {
-            printf("NON SEI QUE CARALLO ESTOY FACENDO ENQUI!\n");
+            printf("ERROR FCNTL\n");
         }
     }
 }
