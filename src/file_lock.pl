@@ -14,14 +14,14 @@
 %% lock actually works well.
 :- export(file_lock/1).
 :- pred file_lock(File) # "Create a lock assigned to the file @var{File}.".
-%% `file_lock(+FILE)' Use fcntl POSIX to lock a file, if the file is locked
+%% `file_lock(+FILE)' Use fcntl and semaphore POSIX to lock a file, if the file is locked
 %% the process waits.
 :- true pred file_lock(in(FILE)) :: atm + (foreign).
 %% FILE is an atom, is the name of the file to lock.
 
 :- export(file_unlock/1).
 :- pred file_unlock(File) # "unlock the file @var{File} locked by file_lock(File).".
-%% `file_unlock(+FILE)' unlock the file using fcntl POSIX.
+%% `file_unlock(+FILE)' unlock the file using fcntl and semaphore POSIX.
 :- true pred file_unlock(in(FILE)) :: atm + (foreign).
 %% FILE is an atom, is the name of the file to unlock.
 

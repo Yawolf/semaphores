@@ -27,3 +27,4 @@ sum
 subsNoLock
 sumNoLock
 *.txt~
+*.dylib

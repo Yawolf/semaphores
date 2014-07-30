@@ -4,12 +4,23 @@
 :- use_module(library(strings)).
 :- use_module(tests, [insert/3]).
 
-:- export(replace_aux/4).
+:- export(head/2).
+head([],none).
+head([H|_],H).
+
+:- export(body/2).
+body([],none).
+body([_],none).
+body([_|T],T).
+
+:- export(replace_aux/4). 
 replace_aux([],_,_,_).
-replace_aux([H|T],List,Elem,NewElem) :-
-        replace_aux(T,List2,Elem,NewElem),
-        (H =\= Elem,insert(H,List2,List));
-        (H =:= Elem,insert(NewElem,List2,List)).
+replace_aux(String,NewString,Elem,NewElem) :-
+        body(String,T),
+        replace_aux(T,String2,Elem,NewElem),
+        head(String,H),
+        (H =\= Elem,insert(H,String2,NewString));
+        (H =:= Elem,insert(NewElem,String2,NewString)).
 
 :- export(replace/4).
 replace(List,NewList,Element,NewElement) :-
