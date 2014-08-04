@@ -1,5 +1,6 @@
 :- module(auxiliar, []).
 
+:- use_module('../file_lock').
 :- use_module(library(strings)).
 :- use_module(library(file_utils)).
 :- use_module(library(process)).
@@ -76,3 +77,55 @@ writeNumber(Stream,Number) :-
 :- export(subNumber/2).
 subNumber(Number,Number2) :-
         Number2 is Number-1.
+
+%%Auxiliar predicate: Recursive calls to sum and subs
+:- export(test8_aux/2).
+test8_aux(0,_).
+test8_aux(Number,List) :-
+        cd('/Users/santiago.cervantes/file_lock/src/tests'),
+        prepareNumber(number),
+        process_call(sum,[],[background(P1)]),
+        process_call(subs,[],[background(P2)]),
+        Number2 is Number-1,
+        test8_aux(Number2,List),
+        insert(P1,List,List2), insert(P2,List2,List3),
+        foreachJoin(List3).
+
+%% USED IN TESTRW1 AND TESTRW2
+
+%%Auxiliar predicate: Take the first list element
+:- export(head/2).
+head([],none).
+head([H|_],H).
+
+%%Auxiliar predicate: Take all the list elements but the one
+:- export(body/2).
+body([],none).
+body([_],none).
+body([_|T],T).
+
+%%Auxiliar predicate: Replaces E by O
+:- export(replace_aux/2).
+replace_aux([],_).
+replace_aux([101|T],NewList) :- replace_aux(T,List2),insert(111,List2,NewList).
+replace_aux([H|T],NewList) :- replace_aux(T,List2),insert(H,List2,NewList).
+
+%%Auxiliar predicate: Reverse replace_aux
+:- export(replaceEO/2).
+replaceEO(List,NewList) :-
+        replace_aux(List,List2),reverse(List2,NewList).
+
+%%Auxiliar predicate: Read from a file, process the line and write in a new file
+:- export(loopTextF/2).
+loopTextF(_,0).
+loopTextF(Stream,Number) :-
+        get_line(Stream,String),
+        replaceEO(String,NewString),
+        file_lock('fdsa.txt'),
+        open('fdsa.txt',append,Stream2),
+        write_string(Stream2,NewString),
+        write_string(Stream2,"\n"),
+        close(Stream2),
+        file_unlock('fdsa.txt'),
+        Number2 is Number-1,
+        loopTextF(Stream,Number2).

@@ -5,6 +5,7 @@
 :- use_module(library(system)).
 
 main :-
+        create_lock('asdf.txt'),
         file_lock('asdf.txt'),
         file_to_string('asdf.txt',String),
         write_string(String),

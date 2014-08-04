@@ -7,19 +7,47 @@
 #include <sys/stat.h>
 #include <semaphore.h>
 
-struct flock fl; /* struct for fcntl */
 int fd; /*File descriptor for the file to lock*/
 sem_t * sem; /* semaphore address */
-char SEM_NAME[255]; /* Name of the semaphore */
+struct flock fl;
 
+/* Create a semaphore and set it with the value 1*/
+void create_lock (char * file) {
+    char SEM_NAME[245]; /* Name of the semaphore */
+
+    if (strlen(file) == 0) {
+        fprintf(stderr,"Invlaid lock name");
+        exit(-1);
+    }
+    
+    sprintf(SEM_NAME,"/sem_%s",file);
+    
+    /* Create the semaphore, the value of the semaphore is 1 because there can be only
+       one process working in the locked file*/
+    if ((sem = sem_open(SEM_NAME, O_CREAT, 0644, 1)) == SEM_FAILED) {
+        perror("sem_open");
+        exit(-1);
+    }
+    //printf("SEMAPHORE VALUE: %p\n",sem);
+    
+}
+
+/* Lock a file */
 void file_lock (char * file) {
-    sprintf(SEM_NAME,"/sem_%s",file); /* all the semaphores are named /sem_${file_to_lock} */
+    // int value;
     
     /*Set fcntl params*/
     fl.l_type = F_WRLCK;
     fl.l_whence = SEEK_SET;
     fl.l_start = 0;
     fl.l_len = 0;
+    fl.l_pid = getpid();
+
+    create_lock(file);
+
+    sem_wait(sem); /* decrement the semaphore value, now the semaphore has value 0, any process can continue */
+
+    // printf("SEMAPHORE VALUE: %p\n",sem);
 
     /*try to open the file to lock, if it fails is because the file does not exist*/
     if ((fd = open(file,O_RDWR)) == -1) {
@@ -27,18 +55,14 @@ void file_lock (char * file) {
         return;
     }
 
-    /* Create the semaphore, the value of the semaphore is 1 because there can be only
-       one process working in the locked file*/
-    sem = sem_open(SEM_NAME, O_CREAT, 0644, 1);
+    //sem_getvalue(sem,&value);
+    //    printf("SEM en memoria: %p\n", sem);
+    // printf("value before sem: %d\n",*value);
 
-    /* if the creation of the semaphore fails, the program fails*/
-    if(sem == SEM_FAILED) {
-        perror("sem_open"); /* Shouldn't print this error never */
-        return;
-    }
-    sem_wait(sem); /* decrement the semaphore value, now the semaphore has value 0, any process can continue */
     if (fcntl(fd, F_SETLK, &fl) == -1) { /* lock the file using fcntl*/
         if (errno == EACCES || errno == EAGAIN) {
+            //            sem_getvalue(sem,&value);
+            //      printf("Value after sem: %d\n",value);
             printf("ERROR,SHOULDN'T PRINT THIS!\n"); /* shouldn't print this error */
         } else {
             printf("ERROR FCNTL\n");
@@ -46,6 +70,7 @@ void file_lock (char * file) {
     }
 }
 
+/* Unlock a file */
 void file_unlock (char * file) {
     /* Set the fcntl params */
     fl.l_type = F_UNLCK;
@@ -59,5 +84,23 @@ void file_unlock (char * file) {
         return;
     }
     sem_post(sem); /* increment the semaphore value, other process can continue */
-    sem_close(sem); /* close the semaphore */
+}
+
+/* Destroy the semaphore created before */
+void destroy_lock (char * file) {
+    char SEM_NAME[245]; /* Name of the semaphore */
+
+    if (strlen(file) == 0) { /* the file name cannot be empty */
+        fprintf(stderr,"Invlaid lock name");
+        exit(-1);
+    }
+    
+    sprintf(SEM_NAME,"/sem_%s",file); /* concat /sem_ to the file name */
+
+    //    printf("LOCK NAME: %s\n",SEM_NAME);
+    
+    if (sem_unlink(SEM_NAME) == -1) { /* destroy the semaphore */
+        perror("sem_unlink");
+        exit(-1);
+    }
 }

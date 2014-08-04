@@ -28,3 +28,7 @@ subsNoLock
 sumNoLock
 *.txt~
 *.dylib
+testRW1
+testRW2
+final
+textEnd

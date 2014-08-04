@@ -6,8 +6,9 @@
 
 :- export(main/0).
 main :-
+        create_lock('asdf.txt'),
         file_lock('asdf.txt'),
         open('asdf.txt',append,Stream),
         write_string(Stream,"1\n"),
-        file_unlock('asdf.txt'),
-        close(Stream).
+        close(Stream),
+        file_unlock('asdf.txt').
