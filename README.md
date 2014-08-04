@@ -27,6 +27,9 @@ Author: Santiago Cervantes, IMDEA Software Institute.
 
 3 - USAGE
 
+    create_lock(FILE) -> This predicate create a lock for the file FILE.
+                        FILE is an atom.
+
      file_lock(FILE) -> This predicate lock the file FILE,
      if it is free.
                        FILE is an atom.
@@ -34,9 +37,11 @@ Author: Santiago Cervantes, IMDEA Software Institute.
      file_unlock(FILE) -> This predicate is the opposite of file_lock, unlock the file FILE.
                        FILE is an atom.
 
+     destroy_lock(FILE) -> This predicate destroy the lock assigned to the file FILE 
+
      lopen(FILE,MODE,STREAM) -> lock open, is only a open called with locks. Is equals to:
                              ```
-                             lock_file("FILE"),open(FILE,MODE,STREAM).
+                             create_lock(FILE),lock_file(FILE),open(FILE,MODE,STREAM).
                              ```
                         
                        FILE is an atom.
@@ -55,7 +60,4 @@ Author: Santiago Cervantes, IMDEA Software Institute.
 
 4 - BUGS AND KNOWN ISSUES
 
-    Some tests don't work properly.
-    Strange behaviour in Ciao:
-            {ERROR: No handle found for thrown error error(process_error(2,pcall(sum,[],[])))}
-            {ERROR: No handle found for thrown error error(process_error(2,pcall(subs,[],[])))}
+    This lock only works for files in the concurrent directory.
