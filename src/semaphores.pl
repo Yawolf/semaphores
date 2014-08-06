@@ -1,61 +1,80 @@
-:- module(file_lock, [], [foreign_interface]).
+:- module(semaphores, [], [foreign_interface]).
 
-:- doc(title, "File lock").
+:- doc(title, "Semaphores").
 
 :- doc(author, "Santiago Cervantes").
 
-:- doc(module, "This is basic file lock implementation as support of open and close predicate.
-").
+:- doc(module, "This is basic semaphore implementation to synchronize
+concurrent process.  ").
 
 %% IDEA: Create a basic file lock that avoid the access to a file
 %% while the lock exists.
 
 :- export(sem_open/3).
-:- pred sem_open(File,Value,Sem_name) # "Create a lock and assign it to the file @var{File}.".
-%% `create_lock(+File)' create a lock for the file File, actually, the use of this predicate is not
-%% obligatory but it is completely recommendable.
-:- true pred sem_open(in(FILE),in(VALUE),go(SEM)) :: atm * int * address + (foreign(prolog_sem_open), returns(SEM)).
-%% FILE is an atom, is the name of the file to lock.
+:- pred sem_open(Name,Value,Sem) # "Try to
+open a semaphore named @var{Name}, if the semaphore does not exists a
+new semaphore is created with name @var{Name} value @var{Value} and
+returned in @var{Sem}.".
+%% `sem_open(+Name,+Value,-Sem)' Open or create a semaphore, actually,
+%% the use of this predicate is not obligatory but it is completely
+%% recommendable.
+:- true pred sem_open(in(NAME),in(VALUE),go(SEM)) :: atm * int *
+address + (foreign(prolog_sem_open), returns(SEM)).
+%% NAME is an atom, is the name of the semaphore.
+%% VALUE is an Integer, is thu value of the semaphore.
+%% SEM is a free variable, is a pointer to the semaphore.
 
-% TODO: `open(File,Mode,Stream)` has a lock inside, need to test if this
-%% lock actually works well.
 :- export(sem_wait/1).
-:- pred sem_wait(File) # "Lock the file @var{File}.".
-%% `file_lock(+FILE)' Use fcntl and semaphore POSIX to lock a file, if the file is locked
-%% the process waits.
+:- pred sem_wait(Sem) # "Decrement in one the
+value of the semaphore @var{Sem}, if the current value is 0, the
+process will stop till the increment of the value.".
+%% `sem_wait(+SEM)' Decrement the semaphero value, if the current
+%% value is 0 the process waits.
 :- true pred sem_wait(in(SEM)) :: address + (foreign(prolog_sem_wait)).
 %% FILE is an atom, is the name of the file to lock.
 
 :- export(sem_post/1).
-:- pred sem_post(File) # "unlock the file @var{File} locked by file_lock(File).".
+:- pred sem_post(Sem) # "Increment in one the
+value of the semaphore @var{Sem}, If te current value is 0, then the
+new value is 1 and stopped process will try catch the semaphore.".
 %% `file_unlock(+FILE)' unlock the file using fcntl and semaphore POSIX.
 :- true pred sem_post(in(SEM)) :: address + (foreign(prolog_sem_post)).
 %% FILE is an atom, is the name of the file to unlock.
 
 :- export(sem_destroy/1).
-:- pred sem_destroy(File) # "Destroy the lock assigned to the file @var{File}".
-%% This predicate is highly recommendable to use becase, after using a semaphore, it won't 
-%% disappear, you need to destroy it.
+:- pred sem_destroy(Sem) # "Destroy the semaphore @var{Sem}".
+%% This predicate is highly recommendable to use becase, after using a
+%% semaphore, it won't disappear, you need to destroy it.
 :- true pred sem_destroy(in(SEM)) :: address + (foreign(prolog_sem_destroy)).
 %% FILE is an atom, is the name of the file to unlock.
 
-% TODO: this predicate can be improved. Implemented only for tests
-%% lopen: is an open predicate with a lock ready to use. 
-%:- export(lopen/3).
-%:- pred lopen(File,Mode,Stream) # "Open and lock the file @var{File} in mode @var{Mode} and save it in the @var{Stream} stream".
-%lopen(File,Sem_mode,Mode,Stream) :- sem_create(File,), sem_wait(File), open(File,Mode,Stream).
-%% File is an atom, is the name of the file to lock.
+% TODO: this predicate can be improved.
+%% lock_open: is an open predicate with a semaphore with value 1. 
+:- export(lock_open/4).
+:- pred lock_open(File,Mode,Stream,Sem) # "Open
+the file @var{File} in mode @var{Mode} and save it in the @var{Stream}
+stream and a semaphore with value 1 is created, name @var{File} and
+save it in the free variable @var{Sem}.".
+lock_open(File,Mode,Stream,Sem) :-
+        sem_create(File,Mode,Sem),
+        sem_wait(Sem),
+        open(File,Mode,Stream).
+%% File is an atom, is the name of the file to open and semaphore.
 %% Mode is an atom, is the file open mode read, write, append.
 %% Stream is a free variable, it will contain the Stream of the File.
+%% Sem is a free variable, it will contain the semaphore.
 
-% TODO: this predicate can be improved. Implemented only for tests.
-%% lclose: this is a close predicate with the "releasing" of the lock.
+% TODO: this predicate can be improved.
+%% lock_close: this is a close predicate with the "releasing" of the semaphore.
 
-%:- pred lclose(File,Stream) # "Remove the lock assigned to the file @var{File} and close the stream @var{Stream} given by lopen(File,Mode,Stream)".
-%:- export(lclose/2).
-%lclose(File,Stream) :- file_unlock(File), close(Stream).
-%% File is an atom, is the name of the file to unlock.
-%% Stream is the Stream of a file given by the lopen predicate.
+:- pred lock_close(Stream,Sem) # "Release the semaphore @var{Sem} andclose
+        the stream @var{Stream}.".
+:- export(lock_close/2).
+lock_close(Stream,Sem) :- sem_post(Sem), close(Stream).
+%% Stream is the Stream of a file given by the lock_open predicate.
+%% Sem is a semaphore.
+
+% TODO: Anonymous semaphores using sem_init could be implemented.
 
 :- use_foreign_source(file_lock).
-:- extra_compiler_opts(['-g','-pthread', '-Wall']).
+:- extra_compiler_opts(['-pthread', '-Wall']).
