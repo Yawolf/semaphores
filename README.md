@@ -18,16 +18,16 @@ Author: Santiago Cervantes, IMDEA Software Institute.
    a predicate with a lock created and ready to use.
 
 
-
 2 - FILES
     
-    file_lock.c -> file lock's implementation in C language programming.
-    file_lock.pl -> file lock's predicates declaration for Ciao (Prolog).
-
+    file_lock.c -> File lock's implementation in C language programming.
+    file_lock.pl -> File lock's predicates declaration for Ciao (Prolog).
+    tests.pl -> Some tests to prove the file lock.
+    auxiliar.pl -> Auxiliar predicates used in the tests.
 
 3 - USAGE
 
-    create_lock(FILE) -> This predicate create a lock for the file FILE.
+     create_lock(FILE) -> This predicate create a lock for the file FILE.
                         FILE is an atom.
 
      file_lock(FILE) -> This predicate lock the file FILE,
@@ -56,7 +56,7 @@ Author: Santiago Cervantes, IMDEA Software Institute.
                        FILE is an atom.
                        STREAM is a stream of a opened file.
 
-
+      Use destroy_lock(File) in a recursive predicate isn't a great idea.
 
 4 - BUGS AND KNOWN ISSUES
 

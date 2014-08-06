@@ -16,7 +16,8 @@
 writeLoop(_,0,List) :- foreachJoin(List).
 writeLoop(Test,Num,List) :-
         Num2 is Num-1,
-        process_call(Test,[],[background(P1)]),
+        atom_number(Atom,Num),
+        process_call(Test,[Atom],[background(P1)]),
         insert(P1,List,List2),
         writeLoop(Test,Num2,List2).
 
@@ -84,12 +85,14 @@ test8_aux(0,_).
 test8_aux(Number,List) :-
         cd('/Users/santiago.cervantes/file_lock/src/tests'),
         prepareNumber(number),
+        sem_open(number,1,Sem),
         process_call(sum,[],[background(P1)]),
         process_call(subs,[],[background(P2)]),
         Number2 is Number-1,
         test8_aux(Number2,List),
         insert(P1,List,List2), insert(P2,List2,List3),
-        foreachJoin(List3).
+        foreachJoin(List3),
+        sem_destroy(Sem).
 
 %% USED IN TESTRW1 AND TESTRW2
 
@@ -121,11 +124,26 @@ loopTextF(_,0).
 loopTextF(Stream,Number) :-
         get_line(Stream,String),
         replaceEO(String,NewString),
-        file_lock('fdsa.txt'),
+   %     file_lock('fdsa.txt'),
         open('fdsa.txt',append,Stream2),
         write_string(Stream2,NewString),
         write_string(Stream2,"\n"),
         close(Stream2),
-        file_unlock('fdsa.txt'),
+    %    file_unlock('fdsa.txt'),
         Number2 is Number-1,
         loopTextF(Stream,Number2).
+
+:- export(loopTextNoLock/2).
+loopTextNoLock(_,0).
+loopTextNoLock(Stream,Number) :-
+        get_line(Stream,String),
+        replaceEO(String,NewString),
+        open('fdsa.txt',append,Stream2),
+        write_string(Stream2,NewString),
+        write_string(Stream2,"\n"),
+        close(Stream2),
+        Number2 is Number-1,
+        loopTextNoLock(Stream,Number2).
+
+:- export(prepareFile/1).
+prepareFile(File) :- open(File,write,Stream),close(Stream).
