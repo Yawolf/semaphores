@@ -7,8 +7,8 @@
 :- doc(module, "This is basic semaphore implementation to synchronize
 concurrent process.  ").
 
-%% IDEA: Create a basic file lock that avoid the access to a file
-%% while the lock exists.
+%% IDEA: Create a basic semaphore POSIX that allow the concurrency
+%% between process.
 
 :- export(sem_open/3).
 :- pred sem_open(Name,Value,Sem) # "Try to
@@ -31,22 +31,22 @@ process will stop till the increment of the value.".
 %% `sem_wait(+SEM)' Decrement the semaphero value, if the current
 %% value is 0 the process waits.
 :- true pred sem_wait(in(SEM)) :: address + (foreign(prolog_sem_wait)).
-%% FILE is an atom, is the name of the file to lock.
+%% SEM is an address, is the semaphore to decrement.
 
 :- export(sem_post/1).
 :- pred sem_post(Sem) # "Increment in one the
 value of the semaphore @var{Sem}, If te current value is 0, then the
 new value is 1 and stopped process will try catch the semaphore.".
-%% `file_unlock(+FILE)' unlock the file using fcntl and semaphore POSIX.
+%% `sem_post(+SEM)' Increment the value of the semaphore SEM.
 :- true pred sem_post(in(SEM)) :: address + (foreign(prolog_sem_post)).
-%% FILE is an atom, is the name of the file to unlock.
+%% SEM is an address, is the semaphore to increment.
 
 :- export(sem_destroy/1).
 :- pred sem_destroy(Sem) # "Destroy the semaphore @var{Sem}".
 %% This predicate is highly recommendable to use becase, after using a
 %% semaphore, it won't disappear, you need to destroy it.
 :- true pred sem_destroy(in(SEM)) :: address + (foreign(prolog_sem_destroy)).
-%% FILE is an atom, is the name of the file to unlock.
+%% SEM is an address, is the name name to the semaphore to destroy.
 
 % TODO: this predicate can be improved.
 %% lock_open: is an open predicate with a semaphore with value 1. 
@@ -67,7 +67,7 @@ lock_open(File,Mode,Stream,Sem) :-
 % TODO: this predicate can be improved.
 %% lock_close: this is a close predicate with the "releasing" of the semaphore.
 
-:- pred lock_close(Stream,Sem) # "Release the semaphore @var{Sem} andclose
+:- pred lock_close(Stream,Sem) # "Release the semaphore @var{Sem} and close
         the stream @var{Stream}.".
 :- export(lock_close/2).
 lock_close(Stream,Sem) :- 
