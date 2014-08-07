@@ -18,12 +18,6 @@
 /* Create a semaphore and set it with the value 1*/
 sem_t *prolog_sem_open(char * name, int value) {
     sem_t *sem; /* semaphore address */
-    
-    if (strlen(name) == 0) {
-        fprintf(stderr,"Invalid lock name");
-        exit(-1);
-    }
-    
     /* Create the semaphore, the value of the semaphore is 1 because
        there can be only one process working in the locked file*/
     if ((sem = sem_open(name, O_CREAT, 0644, value)) == SEM_FAILED) {

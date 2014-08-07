@@ -18,7 +18,11 @@ returned in @var{Sem}.".
 %% `sem_open(+Name,+Value,-Sem)' Open or create a semaphore, actually,
 %% the use of this predicate is not obligatory but it is completely
 %% recommendable.
-:- true pred sem_open(in(NAME),in(VALUE),go(SEM)) :: atm * int *
+sem_open(NAME,VALUE,SEM) :-
+        length(Name,S),
+        S > 0,
+        sem_open_(NAME,VALUE,SEM).
+:- true pred sem_open_(in(NAME),in(VALUE),go(SEM)) :: atm * int *
 address + (foreign(prolog_sem_open), returns(SEM)).
 %% NAME is an atom, is the name of the semaphore.
 %% VALUE is an Integer, is thu value of the semaphore.
