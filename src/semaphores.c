@@ -28,27 +28,35 @@ sem_t *prolog_sem_open(char * name, int value) {
        there can be only one process working in the locked file*/
     if ((sem = sem_open(name, O_CREAT, 0644, value)) == SEM_FAILED) {
         perror("sem_open");
-        exit(-1);
+        return NULL;
     }
     return sem;
 }
 
 /* Lock a file */
-void prolog_sem_wait (sem_t * sem) {
-    sem_wait(sem); /* decrement the semaphore value, now the semaphore
+void prolog_sem_wait(sem_t *sem) {
+    if (sem_wait(sem) == -1)
+        if (errno == EINVAL) {
+            perror("sem_wait");
+            return;
+        } /* decrement the semaphore value, now the semaphore
                       has value 0, any process can continue */
 }
 
 /* Unlock a file */
-void prolog_sem_post (sem_t * sem) {
-    sem_post(sem); /* increment the semaphore value, other process can
-                      continue */
+void prolog_sem_post(sem_t *sem) {
+    if (sem_post(sem) == -1) /* increment the semaphore value, other
+                                process can continue */
+        if (errno == EINVAL) {
+            perror("sem_wait");
+            return;
+        }          
 }
 
 /* Destroy the semaphore created before */
-void prolog_sem_destroy (sem_t * sem) {
+void prolog_sem_destroy(sem_t *sem) {
     if (sem_close(sem) == -1) { /* destroy the semaphore */
         perror("sem_unlink");
-        exit(-1);
+        return;
     }
 }

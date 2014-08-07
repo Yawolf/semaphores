@@ -1,16 +1,22 @@
 :- module(tests, []).
 
-:- use_module('../file_lock').
+:- use_module('../semaphores').
 :- use_module(library(system)).
 :- use_module(library(process)).
-:- use_module(auxiliar, [writeLoop/3, foreachJoin/1, insert/3, fileArithm/2, prepareNumber/1, test8_aux/2, prepareFile/1]).
+:- use_module(auxiliar, [writeLoop/3,
+        foreachJoin/1,
+        insert/3,
+        fileArithm/2,
+        prepareNumber/1,
+        test8_aux/2,
+        prepareFile/1]).
 
-%% This test runs two Ciao proces, test1 writes a string into a file and test2 reads the string in the file.
+%% This test runs two Ciao proces, test1 writes a string into a file
+%% and test2 reads the string in the file.
 
 %%Test: starts Number concurrent writters and one reader
 :- export(test5/1).
 test_1(Number) :-
-        cd('/Users/santiago.cervantes/file_lock/src/tests'),
         writeLoop(test1,Number,[]),
         process_call(test2,[],[background(P1)]),
         process_join(P1).
@@ -20,14 +26,16 @@ test_1(Number) :-
 test_2(Number,List) :- 
         test8_aux(Number,List).
 
-%%Test: Read lines from 2 different files, process them and then write them in a new file
+%%Test: Read lines from 2 different files, process them and then write
+%%them in a new file
 :- export(testConcurrentWritting/0).
 test_concurrent_writting :-
-        cd('/Users/santiago.cervantes/file_lock/src/tests'),
         prepareFile('fdsa.txt'),
+        sem_open(fdsa,1,Sem),
         process_call(testRW1,[],[background(P1)]),
         process_call(testRW2,[],[background(P2)]),
-        process_join(P1),process_join(P2).
+        process_join(P1),process_join(P2),
+        sem_destroy(Sem).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% THIS IS THE IMPORTANT TEST %%

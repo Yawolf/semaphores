@@ -56,7 +56,7 @@ the file @var{File} in mode @var{Mode} and save it in the @var{Stream}
 stream and a semaphore with value 1 is created, name @var{File} and
 save it in the free variable @var{Sem}.".
 lock_open(File,Mode,Stream,Sem) :-
-        sem_create(File,Mode,Sem),
+        sem_open(File,Mode,Sem),
         sem_wait(Sem),
         open(File,Mode,Stream).
 %% File is an atom, is the name of the file to open and semaphore.
@@ -70,11 +70,13 @@ lock_open(File,Mode,Stream,Sem) :-
 :- pred lock_close(Stream,Sem) # "Release the semaphore @var{Sem} andclose
         the stream @var{Stream}.".
 :- export(lock_close/2).
-lock_close(Stream,Sem) :- sem_post(Sem), close(Stream).
+lock_close(Stream,Sem) :- 
+        sem_post(Sem),
+        close(Stream).
 %% Stream is the Stream of a file given by the lock_open predicate.
 %% Sem is a semaphore.
 
 % TODO: Anonymous semaphores using sem_init could be implemented.
 
-:- use_foreign_source(file_lock).
+:- use_foreign_source(semaphores).
 :- extra_compiler_opts(['-pthread', '-Wall']).
