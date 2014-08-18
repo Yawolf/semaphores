@@ -1,4 +1,5 @@
 :- module(semaphores, [], [foreign_interface, regtypes, isomodes]).
+:- use_package([assertions]).
 
 :- doc(title, "Semaphores").
 
@@ -6,15 +7,13 @@
 
 :- doc(module, "Semaphore primitive implementation. Semaphores is a
    way of syncronize concurrent process. Each semaphore has a
-   internal counter wich can be incremented or decremented using
+   internal counter which can be incremented or decremented using
    sem_wait(Sem) and sem_post(Sem). The counter can never go below
-   zero, if a process trys a sem_wait(Sem) and finds that the counter
-   is zero, that process will wait untill another process calls
+   zero, if a process try a sem_wait(Sem) and find that the counter
+   is zero, that process will wait until another process calls
    sem_post(Sem).").
 
-:- doc(bug, "Implement anonymous semaphores (needs shared mem)").
 :- doc(bug, "Write examples").
-:- doc(bug, "Add term wrappers for semaphore addresses").
 
 :- regtype semaphore(Sem) # "@var{Sem} is a semaphore".
 semaphore('$semaphore'(Addr)) :- address(Addr).
@@ -30,16 +29,16 @@ sem_open(Name,Value,Sem) :-
         sem_open_(Name,Value,Addr),
         Sem = '$semaphore'(Addr).
 
-%% 'check_sem_name(+Name)` :: atm # Check if the Name of the semaphore
-%% is valid o not.
+:- pred check_sem_name(+Name) :: atm # "Check if the Name of the
+semaphore is valid o not.".
 check_sem_name(Name) :-
         ( var(Name) -> throw(error(instantiation_error))
-        ; Name = '' -> throw(error(domain_error))
+        ; atom(Name) = '' -> throw(error(domain_error))
         ; true
         ).
 
-%% 'check_sem(+Sem)` :: sempahore # Tests if the entry value is a
-%% valid semaphore.
+:- pred check_sem(+Sem) :: sempahore # "Test if the entry value is a
+valid semaphore.".
 check_sem(Sem) :-
         ( var(Sem) -> throw(error(isntantation_error))
         ; Sem = '$semaphore'(_) -> true 
@@ -73,15 +72,68 @@ sem_post(Sem) :-
 
 :- true pred sem_post_(in(SEM)) :: address + (foreign(prolog_sem_post)).
 
-:- export(sem_destroy/1).
-:- pred sem_destroy(+Sem) :: semaphore # "Destroy the semaphore @var{Sem}".
+:- export(sem_closey/1).
+:- pred sem_close(+Sem) :: semaphore # "Destroy the semaphore @var{Sem}".
 
-sem_destroy(Sem) :-
+sem_close(Sem) :-
         check_sem(Sem),
         Sem = '$semaphore'(Addr),
         sem_destroy_(Addr).
 
-:- true pred sem_destroy_(in(SEM)) :: address + (foreign(prolog_sem_destroy)).
+:- true pred sem_close_(in(SEM)) :: address + (foreign(prolog_sem_close)).
 
+:- doc(appendix, "
+
+@subsection{Examples}
+
+This is a simple example of the semaphore usage with value 1. Two
+process write Number times in a file, one process writes the number 1
+and the other writes 2. In this test can be only one process writting
+at time, it means, at the end of the execution cannot be numbers
+interleaved.
+
+@bf{File} @em{test_writing.pl}:
+
+@begin{verbatim}
+:- module(test_write, []).
+
+:- use_module(semaphores).
+:- use_module(library(strings)).
+        
+:- export(recursive_writting/2).
+recursive_writting(0,_). 
+recursive_writting(Iterations,Number) :-
+        open('test.txt',append,Stream),
+        number_codes(Number,StrNumber),
+        write_string(Stream,StrNumber),
+        nl(Stream),
+        close(Stream),
+        Iterations2 is Iterations-1,
+        recursive_writting(Iterations2,Number).
+
+:- export(main/1).
+main([ARG1,ARG2]) :-
+        atom_number(ARG1,Iterations),
+        atom_number(ARG2,Number),
+        sem_open(test,1,Sem),
+        sem_wait(Sem),
+        recursive_writting(Iterations,Number),
+        sem_post(Sem).
+@end{verbatim}
+
+@bf{File} @em{test.pl}:
+
+@begin{verbatim}
+test_write_loop(Number) :-
+        process_call(path(ciaoc),['test_write'],[]),
+        atom_number(Atom,Number),
+        sem_open(test,1,Sem),
+        process_call(test_write,[Atom,'1'],[background(P1)]),
+        process_call(test_write,[Atom,'2'],[background(P2)]),
+        process_join(P1),process_join(P2),
+        sem_destroy(Sem).
+
+@end{verbatim}
+").
 :- use_foreign_source(semaphores).
 :- extra_compiler_opts(['-pthread', '-Wall']).

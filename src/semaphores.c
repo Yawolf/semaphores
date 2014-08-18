@@ -48,7 +48,7 @@ void prolog_sem_post(sem_t *sem) {
 }
 
 /* Destroy the semaphore created before */
-void prolog_sem_destroy(sem_t *sem) {
+void prolog_sem_close(sem_t *sem) {
     if (sem_close(sem) == -1) { /* destroy the semaphore */
         perror("sem_unlink");
         return;
