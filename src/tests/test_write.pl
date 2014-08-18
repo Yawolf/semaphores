@@ -3,9 +3,9 @@
 :- use_module('../semaphores').
 :- use_module(library(strings)).
         
-:- export(recursive_writting/2).
-recursive_writting(0,_). 
-recursive_writting(Iter,Number) :-
+:- export(recursive_writing/2).
+recursive_writing(0,_). 
+recursive_writing(Iter,Number) :-
         open('fdsa.txt',append,Stream),
         number_codes(Number,StrNumber),
         write_string(Stream,StrNumber),

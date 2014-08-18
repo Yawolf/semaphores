@@ -46,22 +46,22 @@ increment_and_decrement(Number,List) :-
 %% Test: Start Number process and each process increments Iter times a
 %% number in a file, the final number must be the same as (Number *
 %% Iter). Avoid race conditions.
-:- export(test_sumatory/2).
-test_sumatory(Number,Iter) :- %% Number = process, Iter = iterations by process
+:- export(test_summatory/2).
+test_summatory(Number,Iter) :- %% Number = process, Iter = iterations by process
         prepare_number_file(number),
-        process_call(path(ciaoc),[test_sumatory],[]),
+        process_call(path(ciaoc),['test_summatory'],[]),
         sem_open(number,1,Sem),
-        test_sumatory_(Number,Iter,number,List),
+        test_summatory_(Number,Iter,number,List),
         foreach_join(List),
         sem_close(Sem).
 
-:- export(test_sumatory_/4).
-test_sumatory_(0,_,_,_).
-test_sumatory_(Number,Iter,Sem,List) :-
+:- export(test_summatory_/4).
+test_summatory_(0,_,_,_).
+test_summatory_(Number,Iter,Sem,List) :-
         atom_number(Atom,Iter),
-        process_call(test_sumatory,[Atom,Sem],[background(P1)]),
+        process_call('test_summatory',[Atom,Sem],[background(P1)]),
         Number2 is Number-1,
-        test_sumatory_(Number2,Iter,Sem,List2),
+        test_summatory_(Number2,Iter,Sem,List2),
         insert(P1,List2,List).
 
          %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -86,7 +86,8 @@ insert(X,[A|L],[A|L1]) :- insert(X,L,L1).
 :- export(prepare_number_file/1).
 prepare_number_file(Name) :-
         open(Name,write,Stream),
-        write_string(Stream,"0\n"),
+        write_string(Stream,"0"),
+        nl(Stream),
         close(Stream).
 
 %% Truncate the file File.

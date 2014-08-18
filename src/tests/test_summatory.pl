@@ -1,7 +1,8 @@
-:- module(test_semaphores, []).
+:- module(test_summatory, []).
 
 :- use_module('../semaphores').
-:- use_module('auxiliar', [file_to_number/2, writeNumber/2]).
+:- use_module(library(strings)).
+:- use_module(subs, [file_to_number/2]).
 
 :- export(loop/2).
 loop(0,_).
@@ -11,7 +12,9 @@ loop(Iter,Sem) :-
         file_to_number('number',Number),
         NewNumber is Number+1,
         open('number',write,Stream),
-        writeNumber(Stream,NewNumber),
+        number_codes(NewNumber,StrNumber),
+        write_string(Stream,StrNumber),
+        nl(Stream),
         close(Stream),
         sem_post(Sem),
         loop(Iter2,Sem).

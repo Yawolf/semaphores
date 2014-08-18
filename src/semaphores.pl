@@ -37,7 +37,7 @@ check_sem_name(Name) :-
         ; true
         ).
 
-:- pred check_sem(+Sem) :: sempahore # "Test if the entry value is a
+:- pred check_sem(+Sem) :: semaphore # "Test if the entry value is a
 valid semaphore.".
 check_sem(Sem) :-
         ( var(Sem) -> throw(error(isntantation_error))
@@ -72,13 +72,13 @@ sem_post(Sem) :-
 
 :- true pred sem_post_(in(SEM)) :: address + (foreign(prolog_sem_post)).
 
-:- export(sem_closey/1).
+:- export(sem_close/1).
 :- pred sem_close(+Sem) :: semaphore # "Destroy the semaphore @var{Sem}".
 
 sem_close(Sem) :-
         check_sem(Sem),
         Sem = '$semaphore'(Addr),
-        sem_destroy_(Addr).
+        sem_close_(Addr).
 
 :- true pred sem_close_(in(SEM)) :: address + (foreign(prolog_sem_close)).
 
