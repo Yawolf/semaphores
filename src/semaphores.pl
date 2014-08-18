@@ -87,7 +87,7 @@ sem_close(Sem) :-
 @subsection{Examples}
 
 This is a simple example of the semaphore usage with value 1. Two
-process write Number times in a file, one process writes the number 1
+processes write Number times in a file, one process writes the number 1
 and the other writes 2. In this test can be only one process writting
 at time, it means, at the end of the execution cannot be numbers
 interleaved.
@@ -95,21 +95,21 @@ interleaved.
 @bf{File} @em{test_writing.pl}:
 
 @begin{verbatim}
-:- module(test_write, []).
+:- module(test_writing, []).
 
 :- use_module(semaphores).
 :- use_module(library(strings)).
         
-:- export(recursive_writting/2).
-recursive_writting(0,_). 
-recursive_writting(Iterations,Number) :-
+:- export(recursive_writing/2).
+recursive_writing(0,_). 
+recursive_writing(Iterations,Number) :-
         open('test.txt',append,Stream),
         number_codes(Number,StrNumber),
         write_string(Stream,StrNumber),
         nl(Stream),
         close(Stream),
         Iterations2 is Iterations-1,
-        recursive_writting(Iterations2,Number).
+        recursive_writing(Iterations2,Number).
 
 :- export(main/1).
 main([ARG1,ARG2]) :-
@@ -117,19 +117,23 @@ main([ARG1,ARG2]) :-
         atom_number(ARG2,Number),
         sem_open(test,1,Sem),
         sem_wait(Sem),
-        recursive_writting(Iterations,Number),
+        recursive_writing(Iterations,Number),
         sem_post(Sem).
 @end{verbatim}
 
 @bf{File} @em{test.pl}:
 
 @begin{verbatim}
-test_write_loop(Number) :-
-        process_call(path(ciaoc),['test_write'],[]),
+:- use_module(semaphores).
+:- use_module(library(process)).
+
+:- export(test_exclusive_writing/1).
+test_exclusive_writing(Number) :-
+        process_call(path(ciaoc),['test_writing'],[]),
         atom_number(Atom,Number),
         sem_open(test,1,Sem),
-        process_call(test_write,[Atom,'1'],[background(P1)]),
-        process_call(test_write,[Atom,'2'],[background(P2)]),
+        process_call('test_writing',[Atom,'1'],[background(P1)]),
+        process_call('test_writing',[Atom,'2'],[background(P2)]),
         process_join(P1),process_join(P2),
         sem_destroy(Sem).
 

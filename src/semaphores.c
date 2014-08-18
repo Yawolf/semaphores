@@ -27,7 +27,7 @@ sem_t *prolog_sem_open(char * name, int value) {
     return sem;
 }
 
-/* Lock a file */
+/* Decrement the semaphore value, if the value is 0 the process wait */
 void prolog_sem_wait(sem_t *sem) {
     if (sem_wait(sem) == -1)
         if (errno == EINVAL) {
@@ -37,7 +37,7 @@ void prolog_sem_wait(sem_t *sem) {
                       has value 0, any process can continue */
 }
 
-/* Unlock a file */
+/* increment the sempahore value */
 void prolog_sem_post(sem_t *sem) {
     if (sem_post(sem) == -1) /* increment the semaphore value, other
                                 process can continue */
@@ -50,7 +50,7 @@ void prolog_sem_post(sem_t *sem) {
 /* Destroy the semaphore created before */
 void prolog_sem_close(sem_t *sem) {
     if (sem_close(sem) == -1) { /* destroy the semaphore */
-        perror("sem_unlink");
+        perror("sem_close");
         return;
     }
 }
