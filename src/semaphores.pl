@@ -11,9 +11,9 @@
    sem_wait(Sem) and sem_post(Sem). The counter can never go below
    zero, if a process try a sem_wait(Sem) and find that the counter
    is zero, that process will wait until another process calls
-   sem_post(Sem).").
+      sem_post(Sem).").
 
-:- doc(bug, "Write examples").
+:- doc(bug, "Write examples value > 1").
 
 :- regtype semaphore(Sem) # "@var{Sem} is a semaphore".
 semaphore('$semaphore'(Addr)) :- address(Addr).
@@ -138,6 +138,84 @@ test_exclusive_writing(Number) :-
         sem_destroy(Sem).
 
 @end{verbatim}
+
+@subsection{Common Errors} 
+The incorrect use of semaphores can result
+in several errors that are very difficult to detect. 
+
+In this case,
+execute a sem_post before a sem_wait may allow other proccesses
+execute a critical section simultaneously:
+
+@begin{verbatim}
+sem_open(semaphore,1,Sem),
+sem_post(Sem),
+%% CRITICAL SECTION
+sem_wait(Sem).
+@end{verbatim}
+
+Another common error is execute two sem_wait consecutively in a
+semaphore with value 1, the result is a deadlock and no process can continue executing:
+
+@begin{verbatim}
+sem_open(semaphore,1,Sem),
+sem_wait(Sem),
+%% CRITICAL SECTION
+sem_wait(Sem).
+@end{verbatim}
+
+Take care when are you closing the semaphore, maybe you close a
+semaphore at the end of a process but there are one or more processes
+using the same semaphore, this can result in serious errors:
+
+@em{process_1}:
+@begin{verbatim}
+sem_open(semaphore,1,Sem),
+sem_wait(Sem),
+%% CRITICAL SECTION
+sem_post(Sem),
+sem_close(Sem).
+@end{verbatim}
+
+@em{process_2}:
+@begin{verbatim}
+sem_open(semaphore,1,Sem),
+sem_wait(Sem),
+%% CRITICAL SECTION
+sem_post(Sem),
+sem_close(Sem).
+@end{verbatim}
+
+The correct way is:
+
+@em{process_1}:
+@begin{verbatim}
+sem_open(semaphore,1,Sem),
+sem_wait(Sem),
+%% CRITICAL SECTION
+sem_post(Sem).
+@end{verbatim}
+
+@em{process_2}:
+@begin{verbatim}
+sem_open(semaphore,1,Sem),
+sem_wait(Sem),
+%% CRITICAL SECTION
+sem_post(Sem).
+@end{verbatim}
+
+@em{main_process}:
+@begin{verbatim}
+sem_open(semaphore,1,Sem),
+process_call('process_1',[],[background(P1)]),
+process_call('process_2',[],[background(P2)]),
+process_join(P1), process_join(P2),
+sem_close(Sem).
+@end{verbatim}
+
+Remember that sem_open create a new semaphore or open the semaphore if
+it exists
+
 ").
 :- use_foreign_source(semaphores).
 :- extra_compiler_opts(['-pthread', '-Wall']).
