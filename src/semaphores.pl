@@ -86,10 +86,10 @@ sem_close(Sem) :-
 
 @subsection{Examples}
 
-This is a simple example of the semaphore usage with value 1. Two
+This is a simple example of the semaphore usage. Two
 processes write Number times in a file, one process writes the number 1
 and the other writes 2. In this test can be only one process writting
-at time, it means, at the end of the execution cannot be numbers
+at the time, it means, at the end of the execution cannot be numbers
 interleaved.
 
 @bf{File} @em{test_writing.pl}:
@@ -137,6 +137,43 @@ test_exclusive_writing(Number) :-
         process_join(P1),process_join(P2),
         sem_destroy(Sem).
 
+@end{verbatim}
+
+Example using a semaphore with value grater than 1. In this test there
+are a server process and a client process, the server only has 5
+slots for clients so is necessary to control the access to the server:
+
+@bf{File} @em{server.pl}:
+@begin{verbatim}
+:- module(server, []).
+
+:- use_module(semaphores).
+:- use_module(library(process)).
+
+:- export(test_server/1).
+test_server(Clients) :-
+        process_call(path(ciaoc),[client],[]),
+        sem_open('sem_server',5,Sem),
+        test_server_(Clients,0,Pids),
+        foreach_join(Pids),
+        sem_close(Sem).
+
+:- export(test_server_/3).
+test_server_(0,_,_).
+test_server_(Clients,Number,Pids) :-
+        Client2 is Clients-1,
+        Number2 is Number+1,
+        number_codes(Number,StrNumber),
+        append(\"Process \", StrNumber,Name),
+        atom_codes(AtmName,Name),
+        process_call(client,[AtmName],[background(P1)]),
+        test_server_(Client2,Number2,List),
+        insert(P1, List2, Pids).
+@end{verbatim}
+
+@bf{File} @em{client.pl}
+@begin{verbatim}
+@includeverbatim{tests/client.pl}
 @end{verbatim}
 
 @subsection{Common Errors} 

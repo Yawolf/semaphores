@@ -64,6 +64,28 @@ test_summatory_(Number,Iter,Sem,List) :-
         test_summatory_(Number2,Iter,Sem,List2),
         insert(P1,List2,List).
 
+%% Test: A very simple Server-Client test to verify the correct
+%% behaviour in value > 1 sempahore.
+:- export(test_server/1).
+test_server(Clients) :-
+        process_call(path(ciaoc),[client],[]),
+        sem_open('sem_server',5,Sem),
+        test_server_(Clients,0,Pids),
+        foreach_join(Pids),
+        sem_close(Sem).
+
+:- export(test_server_/3).
+test_server_(0,_,_).
+test_server_(Clients,Number,Pids) :-
+        Client2 is Clients-1,
+        Number2 is Number+1,
+        number_codes(Number,StrNumber),
+        append("Process ", StrNumber,Name),
+        atom_codes(AtmName,Name),
+        process_call(client,[AtmName],[background(P1)]),
+        test_server_(Client2,Number2,List),
+        insert(P1, List, Pids).
+
          %%%%%%%%%%%%%%%%%%%%%%%%%%
          %% AUXILIARY PREDICATES %%
          %%%%%%%%%%%%%%%%%%%%%%%%%%
