@@ -139,9 +139,10 @@ test_exclusive_writing(Number) :-
 
 @end{verbatim}
 
-Example using a semaphore with value grater than 1. In this test there
-are a server process and a client process, the server only has 5
-slots for clients so is necessary to control the access to the server:
+Example using a semaphore with value grater than 1 using a very simple
+server-client test. In this test there are a server process and a
+client process, the server has capacity for 5 clients so it's
+necessary to control the access to the server:
 
 @bf{File} @em{server.pl}:
 @begin{verbatim}

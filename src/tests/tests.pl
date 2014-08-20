@@ -64,7 +64,7 @@ test_summatory_(Number,Iter,Sem,List) :-
         test_summatory_(Number2,Iter,Sem,List2),
         insert(P1,List2,List).
 
-%% Test: A very simple Server-Client test to verify the correct
+%% Test: A very simple "Server-Client" test to verify the correct
 %% behaviour in value > 1 sempahore.
 :- export(test_server/1).
 test_server(Clients) :-
@@ -92,7 +92,7 @@ test_server_(Clients,Number,Pids) :-
 
 %% USED IN TESTS
 
-%%Auxiliar predicate: recursive join for all elements process saved in a list
+%%Auxiliar predicate: recursive join for all processes pid saved in a list
 :- export(foreach_join/1).
 foreach_join([H]) :- process_join(H).
 foreach_join([H|T]) :-
