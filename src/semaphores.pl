@@ -1,5 +1,5 @@
 :- module(semaphores, [], [foreign_interface, regtypes, isomodes]).
-:- use_package([assertions]).
+
 
 :- doc(title, "Semaphores").
 
@@ -97,7 +97,7 @@ interleaved.
 @begin{verbatim}
 :- module(test_writing, []).
 
-:- use_module(semaphores).
+:- use_module(library(semaphores)).
 :- use_module(library(strings)).
         
 :- export(recursive_writing/2).
@@ -124,7 +124,7 @@ main([ARG1,ARG2]) :-
 @bf{File} @em{test.pl}:
 
 @begin{verbatim}
-:- use_module(semaphores).
+:- use_module(library(semaphores)).
 :- use_module(library(process)).
 
 :- export(test_exclusive_writing/1).
@@ -148,7 +148,7 @@ necessary to control the access to the server:
 @begin{verbatim}
 :- module(server, []).
 
-:- use_module(semaphores).
+:- use_module(library(semaphores)).
 :- use_module(library(process)).
 
 :- export(test_server/1).
