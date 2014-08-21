@@ -10,11 +10,11 @@
          %% TESTS %%
          %%%%%%%%%%%
 
-%% This test runs two Ciao proces, test1 writes a string into a file
-%% and test2 reads the string in the file.
-
 %% Test: write several lines in each process, check that lines are not
-%% interleaved
+%% interleaved. In this test is proved that a process is blocked by 
+%% the semaphore until the running process execute the sem_post.
+%% The critical section is the file in which the process are writing,
+%% The access of that file must be (and is) synchronized by the semaphore.
 :- export(test_exclusive_writing/1).
 test_exclusive_writing(Number) :-
         process_call(path(ciaoc),['test_write'],[]),
@@ -25,9 +25,13 @@ test_exclusive_writing(Number) :-
         process_join(P1),process_join(P2),
         sem_close(Sem).
 
-%%Test: A number in a file, Number process incrementing that number
-%%and Number process decrementing, the final result must be beginning
-%%number. Avoid race conditions.
+%% Test: A number in a file, Number process incrementing that number
+%% and Number process decrementing, the final result must be beginning
+%% number. The critical section in this test is reading and writing the number
+%% In the file, each process do sem_wait,read,operation,write,sem_post. The
+%% correct exclusión in each iteration is crucial, if a race condition
+%% happen the final value can change so much and execution will end with
+%% errors.
 :- export(increment_and_decrement/2).
 increment_and_decrement(0,_).
 increment_and_decrement(Number,List) :-
@@ -45,7 +49,12 @@ increment_and_decrement(Number,List) :-
 
 %% Test: Start Number process and each process increments Iter times a
 %% number in a file, the final number must be the same as (Number *
-%% Iter). Avoid race conditions.
+%% Iter). This test is very similar at last test but more intensive.
+%% Like in the last test the critical section is the file, but instead
+%% of to have 2 processes doing X iterations, in this test we have
+%% Number processes doing Iter iterations so, the probability to have
+%% a race condition is very high Sempahore with value 1 must
+%% synchronize all that processes and avoid the race condition.
 :- export(test_summatory/2).
 test_summatory(Number,Iter) :- %% Number = process, Iter = iterations by process
         prepare_number_file(number),
@@ -64,8 +73,13 @@ test_summatory_(Number,Iter,Sem,List) :-
         test_summatory_(Number2,Iter,Sem,List2),
         insert(P1,List2,List).
 
-%% Test: A very simple "Server-Client" test to verify the correct
-%% behaviour in value > 1 sempahore.
+%% Test: A very simple test to verify the correct behaviour
+%% in value > 1 sempahore. The critical section in this test is,
+%% actually, the stdout, there cannot be more than 5 processes
+%% "working" in the "server" so, to syncronize the processes and
+%% stop them a semaphore with value 5 is used. When a processes
+%% finish his "work" it leaves the "server" and a new process can
+%% enter.
 :- export(test_server/1).
 test_server(Clients) :-
         process_call(path(ciaoc),[client],[]),
@@ -89,8 +103,6 @@ test_server_(Clients,Number,Pids) :-
          %%%%%%%%%%%%%%%%%%%%%%%%%%
          %% AUXILIARY PREDICATES %%
          %%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% USED IN TESTS
 
 %%Auxiliar predicate: recursive join for all processes pid saved in a list
 :- export(foreach_join/1).

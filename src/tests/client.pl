@@ -5,6 +5,10 @@
 :- use_module(library(system)).
 :- use_module(library(strings)).
 
+%% This is the "client" process for the test_server test in tests.pl file.
+%% Thre process begin, takes the semaphore or wait, print a message and
+%% is paused for a random time to simulate a working time, after that the
+%% process "leave" the server and release the semaphore. 
 :- export(main/1).
 main([ARG1]) :-
         atom_codes(ARG1,Name),

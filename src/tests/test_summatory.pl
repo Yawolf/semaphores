@@ -19,6 +19,10 @@ loop(Iter,Sem) :-
         sem_post(Sem),
         loop(Iter2,Sem).
 
+%% This is the test_summatory process for the test_summatory test
+%% in test.pl. The process take the semaphore, read a number from a file
+%% operate with it and write it back, after that the process release the
+%% semaphore. This process is repeated several times.
 :- export(main/1).
 main([ARG1,ARG2]) :- %% ARG1 = Number of iterations, ARG2 = Semaphore Name.
         atom_number(ARG1,Iter),

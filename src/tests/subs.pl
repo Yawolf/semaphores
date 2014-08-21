@@ -18,6 +18,10 @@ number_to_file(Stream,Number) :-
         write_string(Stream,Code),
         write_string(Stream,"\n").
 
+%% This is the substract process for the increment_and_decrement test
+%% in tests.pl. The process takes the semaphore or wait, read the
+%% number from the file, operate with it and write the new number
+% in the same file, after that, the process release the semaphore.
 :- export(main/0).
 main :- sem_open(number,1,Sem),
         sem_wait(Sem),

@@ -14,6 +14,10 @@ recursive_writing(Iter,Number) :-
         Iter2 is Iter-1,
         recursive_writting(Iter2,Number).
 
+%% This is the test_write process for the test_exclusive_writing
+%% test in the tests.pl. The process take a sempahore or wait,
+%% write a number into a file Iter times and then release the
+%% semaphore.
 :- export(main/1).
 main([ARG1,ARG2]) :-
         atom_number(ARG1,Iter),
