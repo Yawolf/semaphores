@@ -36,3 +36,4 @@ test_semaphores
 test_write
 test_summatory
 client
+test_summation

@@ -16,7 +16,9 @@
 %% The critical section is the file in which the process are writing,
 %% The access of that file must be (and is) synchronized by the semaphore.
 :- export(test_exclusive_writing/1).
+test_exclusive_writing(0) :- !, false.
 test_exclusive_writing(Number) :-
+        (integer(Number) -> true ; false),
         process_call(path(ciaoc),['test_write'],[]),
         atom_number(Atom,Number),
         sem_open(test,1,Sem),
@@ -32,21 +34,28 @@ test_exclusive_writing(Number) :-
 %% correct exclusión in each iteration is crucial, if a race condition
 %% happen the final value can change so much and execution will end with
 %% errors.
-:- export(increment_and_decrement/2).
-increment_and_decrement(0,_).
-increment_and_decrement(Number,List) :-
+
+:- export(increment_and_decrement/1).
+increment_and_decrement(0) :- !, false.
+increment_and_decrement(Number) :-
+        (integer(Number) -> true; false),
         process_call(path(ciaoc),[sum],[]),
         process_call(path(ciaoc),[subs],[]),
         prepare_number_file(number),
         sem_open(number,1,Sem),
+        increment_and_decrement_(Number,List),
+        foreach_join(List),
+        sem_close(Sem).
+
+:- export(increment_and_decrement_/2).
+increment_and_decrement_(0,_).
+increment_and_decrement_(Number,List) :-
         process_call(sum,[],[background(P1)]),
         process_call(subs,[],[background(P2)]),
         Number2 is Number-1,
-        increment_and_decrement(Number2,List),
-        insert(P1,List,List2), insert(P2,List2,List3),
-        foreach_join(List3),
-        sem_close(Sem).
-
+        increment_and_decrement_(Number2,List2),
+        insert(P1,List2,List3), insert(P2,List3,List).
+        
 %% Test: Start Number process and each process increments Iter times a
 %% number in a file, the final number must be the same as (Number *
 %% Iter). This test is very similar at last test but more intensive.
@@ -55,22 +64,26 @@ increment_and_decrement(Number,List) :-
 %% Number processes doing Iter iterations so, the probability to have
 %% a race condition is very high Sempahore with value 1 must
 %% synchronize all that processes and avoid the race condition.
-:- export(test_summatory/2).
-test_summatory(Number,Iter) :- %% Number = process, Iter = iterations by process
+:- export(test_summation/2).
+test_summation(0,0) :- !, false.
+test_summation(_,0) :- !, false.
+test_summation(0,_) :- !, false.
+test_summation(Number,Iter) :- %% Number = process, Iter = iterations by process
+        ((integer(Number),integer(Iter)) -> true; false),
         prepare_number_file(number),
-        process_call(path(ciaoc),['test_summatory'],[]),
+        process_call(path(ciaoc),['test_summation'],[]),
         sem_open(number,1,Sem),
-        test_summatory_(Number,Iter,number,List),
+        test_summation_(Number,Iter,number,List),
         foreach_join(List),
         sem_close(Sem).
 
-:- export(test_summatory_/4).
-test_summatory_(0,_,_,_).
-test_summatory_(Number,Iter,Sem,List) :-
+:- export(test_summation_/4).
+test_summation_(0,_,_,_).
+test_summation_(Number,Iter,Sem,List) :-
         atom_number(Atom,Iter),
-        process_call('test_summatory',[Atom,Sem],[background(P1)]),
+        process_call('test_summation',[Atom,Sem],[background(P1)]),
         Number2 is Number-1,
-        test_summatory_(Number2,Iter,Sem,List2),
+        test_summation_(Number2,Iter,Sem,List2),
         insert(P1,List2,List).
 
 %% Test: A very simple test to verify the correct behaviour
@@ -81,7 +94,9 @@ test_summatory_(Number,Iter,Sem,List) :-
 %% finish his "work" it leaves the "server" and a new process can
 %% enter.
 :- export(test_server/1).
+test_server(0) :- !, false.
 test_server(Clients) :-
+        (integer(Clients) -> true; false),
         process_call(path(ciaoc),[client],[]),
         sem_open('sem_server',5,Sem),
         test_server_(Clients,0,Pids),

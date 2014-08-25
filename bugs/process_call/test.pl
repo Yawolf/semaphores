@@ -1,4 +1,4 @@
-:- module(main, []).
+:- module(test, []).
 
 :- use_module(library(file_utils)).
 :- use_module(library(process)).
@@ -8,42 +8,37 @@
 insert(X,[],[X]).
 insert(X,[A|L],[A|L1]) :- insert(X,L,L1).
 
-:- export(init/2).
-init([_],_).
-init([H|T],List) :- init(T,List2),insert(H,List2,List3),reverse(List3,List).
-
-:- export(foreachJoin/1).
-foreachJoin([H]) :- process_join(H).
-foreachJoin([H|T]) :-
+:- export(foreach_join/1).
+foreach_join([H]) :- process_join(H).
+foreach_join([H|T]) :-
         process_join(H),
-        foreachJoin(T).
+        foreach_join(T).
 
 :- export(file_to_number/2).
 file_to_number(File,Number) :-
         file_to_string(File,String),
-        init(String,ListNum),
+        append(ListNum,"\n",String),
         number_codes(Number,ListNum).
 
-:- export(sumNumber/2).
-sumNumber(Number,Number2) :-
-        Number2 is Number+1.
-
-:- export(writeNumber/2).
-writeNumber(Stream,Number) :-
+:- export(number_to_file/2).
+number_to_file(Stream,Number) :-
         number_codes(Number,Code),
         write_string(Stream,Code),
         write_string(Stream,"\n").
 
-:- export(subNumber/2).
-subNumber(Number,Number2) :-
-        Number2 is Number-1.
-
-:-export(testNoLockNumber/2).
-testNoLockNumber(0,_).
-testNoLockNumber(Number,List) :-
+:- export(test_error/1).
+test_error(0) :- !,false.
+test_error(Number) :-
+        process_call(path(ciaoc),[subsNoLock],[]),
+        process_call(path(ciaoc),[sumNoLock],[]),
+        test_error_(Number,[]).
+        
+:-export(test_error_/2).
+test_error_(0,_).
+test_error_(Number,List) :-
         process_call(sumNoLock,[],[background(P1)]),
         process_call(subsNoLock,[],[background(P2)]),
         Number2 is Number-1,
-        testNoLockNumber(Number2,List),
+        test_error_(Number2,List),
         insert(P1,List,List2), insert(P2,List2,List3),
-        foreachJoin(List3).
+        foreach_join(List3).
