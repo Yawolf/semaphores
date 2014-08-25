@@ -1,4 +1,4 @@
-:- module(sumNoLock, []).
+:- module(_,_,_).
 
 :- use_module(test, [file_to_number/2, number_to_file/2]).
 

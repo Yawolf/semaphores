@@ -1,8 +1,9 @@
-:- module(subs, []).
+:- module(_,_,_).
 
 :- use_module('../semaphores').
-:- use_module(library(strings)).
-:- use_module(library(file_utils)).
+:- use_module(library(strings), [write_string/2]).
+:- use_module(library(file_utils), [file_to_string/2]).
+:- use_module(library(lists), [append/3]).
 
 %% This is the substract process for the increment_and_decrement test
 %% in tests.pl. The process takes the semaphore or wait, read the

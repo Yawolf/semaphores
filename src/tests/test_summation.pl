@@ -1,4 +1,4 @@
-:- module(test_summation, []).
+:- module(_,_,_).
 
 :- use_module('../semaphores').
 :- use_module(library(strings)).

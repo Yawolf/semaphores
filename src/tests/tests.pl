@@ -1,10 +1,9 @@
-:- module(tests, []).
+:- module(_,_,_).
 
 :- use_module('../semaphores').
-:- use_module(library(system)).
-:- use_module(library(strings)).
-:- use_module(library(file_utils)).
+:- use_module(library(strings), [write_string/2]).
 :- use_module(library(process)).
+:- use_module(library(lists), [append/3]).
 
          %%%%%%%%%%%
          %% TESTS %%
@@ -19,6 +18,7 @@
 test_exclusive_writing(0) :- !, false.
 test_exclusive_writing(Number) :-
         (integer(Number) -> true ; false),
+         prepare_file('fdsa.txt'),
         process_call(path(ciaoc),['test_write'],[]),
         atom_number(Atom,Number),
         sem_open(test,1,Sem),
@@ -141,4 +141,4 @@ prepare_number_file(Name) :-
 
 %% Truncate the file File.
 :- export(prepareFile/1).
-prepareFile(File) :- open(File,write,Stream),close(Stream).
+prepare_file(File) :- open(File,write,Stream),close(Stream).

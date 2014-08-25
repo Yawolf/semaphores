@@ -1,9 +1,10 @@
-:- module(client, []).
+:- module(_,_,_).
 
 :- use_module('../semaphores').
-:- use_module(library(random)).
-:- use_module(library(system)).
-:- use_module(library(strings)).
+:- use_module(library(random), [random/3]).
+:- use_module(library(system), [pause/1]).
+:- use_module(library(strings), [write_string/1]).
+:- use_module(library(lists), [append/3]).
 
 %% This is the "client" process for the test_server test in tests.pl file.
 %% Thre process begin, takes the semaphore or wait, print a message and

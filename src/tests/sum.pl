@@ -1,6 +1,5 @@
-:- module(sum, []).
+:- module(_,_,_).
 
-:- use_module(library(system)).
 :- use_module('../semaphores').
 :- use_module(subs, [file_to_number/2, number_to_file/2]).
 

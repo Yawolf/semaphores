@@ -1,8 +1,9 @@
-:- module(test, []).
+:- module(_,_,_).
 
-:- use_module(library(file_utils)).
+:- use_module(library(file_utils), [file_to_string/2]).
+:- use_module(library(strings), [write_string/2]).
+:- use_module(library(lists), [append/3]).
 :- use_module(library(process)).
-:- use_module(library(strings)).
 
 :- export(test_error/1).
 test_error(0) :- !,false.

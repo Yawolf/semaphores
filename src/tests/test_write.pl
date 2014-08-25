@@ -1,7 +1,7 @@
-:- module(test_write, []).
+:- module(_,_,_).
 
 :- use_module('../semaphores').
-:- use_module(library(strings)).
+:- use_module(library(strings), [write_string/2]).
 
 %% This is the test_write process for the test_exclusive_writing
 %% test in the tests.pl. The process take a sempahore or wait,
