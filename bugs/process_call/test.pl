@@ -1,4 +1,4 @@
-:- module(_,_,_).
+:- module(_,[],[]).
 
 :- use_module(library(file_utils), [file_to_string/2]).
 :- use_module(library(strings), [write_string/2]).

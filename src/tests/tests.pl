@@ -1,9 +1,10 @@
-:- module(_,_,_).
+:- module(_,[],[]).
 
 :- use_module('../semaphores').
 :- use_module(library(strings), [write_string/2]).
 :- use_module(library(process)).
 :- use_module(library(lists), [append/3]).
+
 
          %%%%%%%%%%%
          %% TESTS %%
@@ -15,7 +16,7 @@
 %% The critical section is the file in which the process are writing,
 %% The access of that file must be (and is) synchronized by the semaphore.
 :- export(test_exclusive_writing/1).
-test_exclusive_writing(0) :- !, false.
+test_exclusive_writing(0) :- !.
 test_exclusive_writing(Number) :-
         (integer(Number) -> true ; false),
          prepare_file('fdsa.txt'),
@@ -36,7 +37,7 @@ test_exclusive_writing(Number) :-
 %% errors.
 
 :- export(increment_and_decrement/1).
-increment_and_decrement(0) :- !, false.
+increment_and_decrement(0) :- !.
 increment_and_decrement(Number) :-
         (integer(Number) -> true; false),
         process_call(path(ciaoc),[sum],[]),
@@ -48,7 +49,7 @@ increment_and_decrement(Number) :-
         sem_close(Sem).
 
 :- export(increment_and_decrement_/2).
-increment_and_decrement_(0,_).
+increment_and_decrement_(0,_) :- !.
 increment_and_decrement_(Number,List) :-
         process_call(sum,[],[background(P1)]),
         process_call(subs,[],[background(P2)]),
@@ -65,9 +66,8 @@ increment_and_decrement_(Number,List) :-
 %% a race condition is very high Sempahore with value 1 must
 %% synchronize all that processes and avoid the race condition.
 :- export(test_summation/2).
-test_summation(0,0) :- !, false.
-test_summation(_,0) :- !, false.
-test_summation(0,_) :- !, false.
+test_summation(_,0) :- !.
+test_summation(0,_) :- !.
 test_summation(Number,Iter) :- %% Number = process, Iter = iterations by process
         ((integer(Number),integer(Iter)) -> true; false),
         prepare_number_file(number),
@@ -78,13 +78,12 @@ test_summation(Number,Iter) :- %% Number = process, Iter = iterations by process
         sem_close(Sem).
 
 :- export(test_summation_/4).
-test_summation_(0,_,_,_).
-test_summation_(Number,Iter,Sem,List) :-
+test_summation_(0,_,_,[]) :- !.
+test_summation_(Number,Iter,Sem,[P1|List0]) :-
         atom_number(Atom,Iter),
         process_call('test_summation',[Atom,Sem],[background(P1)]),
         Number2 is Number-1,
-        test_summation_(Number2,Iter,Sem,List2),
-        insert(P1,List2,List).
+        test_summation_(Number2,Iter,Sem,List0).
 
 %% Test: A very simple test to verify the correct behaviour
 %% in value > 1 sempahore. The critical section in this test is,
@@ -94,7 +93,7 @@ test_summation_(Number,Iter,Sem,List) :-
 %% finish his "work" it leaves the "server" and a new process can
 %% enter.
 :- export(test_server/1).
-test_server(0) :- !, false.
+test_server(0) :- !.
 test_server(Clients) :-
         (integer(Clients) -> true; false),
         process_call(path(ciaoc),[client],[]),
@@ -104,7 +103,7 @@ test_server(Clients) :-
         sem_close(Sem).
 
 :- export(test_server_/3).
-test_server_(0,_,_).
+test_server_(0,_,_) :- !.
 test_server_(Clients,Number,Pids) :-
         Client2 is Clients-1,
         Number2 is Number+1,
@@ -112,8 +111,8 @@ test_server_(Clients,Number,Pids) :-
         append("Process ", StrNumber,Name),
         atom_codes(AtmName,Name),
         process_call(client,[AtmName],[background(P1)]),
-        test_server_(Client2,Number2,List),
-        insert(P1, List, Pids).
+        Pids = [P1|Pids0],
+        test_server_(Client2,Number2,Pids0).
 
          %%%%%%%%%%%%%%%%%%%%%%%%%%
          %% AUXILIARY PREDICATES %%
@@ -140,5 +139,5 @@ prepare_number_file(Name) :-
         close(Stream).
 
 %% Truncate the file File.
-:- export(prepareFile/1).
+:- export(prepare_file/1).
 prepare_file(File) :- open(File,write,Stream),close(Stream).

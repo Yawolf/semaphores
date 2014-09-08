@@ -1,4 +1,4 @@
-:- module(_,_,_).
+:- module(_,[],[]).
 
 :- use_module('../semaphores').
 :- use_module(subs, [file_to_number/2, number_to_file/2]).

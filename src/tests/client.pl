@@ -1,4 +1,4 @@
-:- module(_,_,_).
+:- module(_,[],[]).
 
 :- use_module('../semaphores').
 :- use_module(library(random), [random/3]).
