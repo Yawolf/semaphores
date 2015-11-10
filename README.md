@@ -17,10 +17,10 @@
 Semaphore primitive implementation. Semaphores is a
 way of syncronize concurrent process. Each semaphore has a
 internal counter which can be incremented or decremented using
-sem<sub>wait</sub>(Sem) and sem<sub>post</sub>(Sem). The counter can never go below
-zero, if a process try a sem<sub>wait</sub>(Sem) and find that the counter
+sem\_wait(Sem) and sem\_post(Sem). The counter can never go below
+zero, if a process try a sem\_wait(Sem) and find that the counter
 is zero, that process will wait until another process calls
-sem<sub>post</sub>(Sem).
+sem\_post(Sem).
 
 # How to use it<a id="orgheadline2"></a>
 
@@ -30,19 +30,19 @@ Just clone the repository and include the module using the repo path:
 
 # Predicates<a id="orgheadline3"></a>
 
-**pred** **sem<sub>open</sub>(+Name,+Value,-Sem)** **::** **atm** \* **int** \* **semaphore**
+**pred** **sem\_open(+Name,+Value,-Sem)** **::** **atm** \* **int** \* **semaphore**
 Tries to open a semaphore named *Name*, if the semaphore does not exist
 a new semaphore is created with name *Name* value *Value* and returned in *Sem*.
 
-**pred** **sem<sub>wait</sub>(+Sem)** **::** **semaphore** 
+**pred** **sem\_wait(+Sem)** **::** **semaphore** 
 Decrements in one the value of the semaphore *Sem*, if the current value is 0, 
 the process will stop till the increment of the value.
 
-**pred** **sem<sub>post</sub>(+Sem)** **::** **semaphore**
+**pred** **sem\_post(+Sem)** **::** **semaphore**
 Increments in one the value of the semaphore *Sem*, If te current value is 0, 
 then the new value is 1 and stopped process will try catch the semaphore.
 
-**pred** **sem<sub>close</sub>(+Sem)** **::** **semaphore** 
+**pred** **sem\_close(+Sem)** **::** **semaphore** 
 Destroys the semaphore *Sem*.
 
 # Examples<a id="orgheadline4"></a>
@@ -53,7 +53,7 @@ and the other writes 2. In this test can be only one process writting
 at time, it means, at the end of the execution cannot be numbers
 interleaved.
 
-\*File: test<sub>writing.pl</sub> \*
+\*File: test\_writing.pl \*
 
     :- module(test_writing, []).
     
@@ -100,7 +100,7 @@ interleaved.
 The incorrect use of semaphores can result
 in several errors that are very difficult to detect. 
 
-In this case, execute a *sem<sub>post</sub>* before a *sem<sub>wait</sub>* may allow other proccesses
+In this case, execute a *sem\_post* before a *sem\_wait* may allow other proccesses
 execute a critical section simultaneously:
 
     sem_open(semaphore,1,Sem),
@@ -108,7 +108,7 @@ execute a critical section simultaneously:
     %% CRITICAL SECTION
     sem_wait(Sem).
 
-Another common error is execute two *sem<sub>wait</sub>* consecutively in a semaphore with value 1,
+Another common error is execute two *sem\_wait* consecutively in a semaphore with value 1,
 the result is a deadlock and no process can continue executing:
 
     sem_open(semaphore,1,Sem),
@@ -160,5 +160,5 @@ The correct way is:
     process_join(P1), process_join(P2),
     sem_close(Sem).
 
-Remember that sem<sub>open</sub> create a new semaphore or open the semaphore if
+Remember that sem\_open create a new semaphore or open the semaphore if
 it exists
