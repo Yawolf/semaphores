@@ -35,4 +35,9 @@ textEnd
 test_semaphores
 test_write
 test_summatory
+<<<<<<< HEAD
 /README.org
+=======
+client
+test_summation
+>>>>>>> 5ea2ceb5fff57d86629b1f583448c3596f580b5b

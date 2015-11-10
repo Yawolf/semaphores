@@ -1,10 +1,10 @@
-:- module(subsNoLock, []).
+:- module(_,_,_).
 
-:- use_module(main, [file_to_number/2, writeNumber/2, subNumber/2]).
+:- use_module(test, [file_to_number/2, number_to_file/2]).
 
 :- export(main/0).
 main :- file_to_number('number',Number),
-        subNumber(Number,Result),
+        Result is Number-1,
         open('number',write,Stream),
-        writeNumber(Stream,Result),
+        number_to_file(Stream,Result),
         close(Stream).
